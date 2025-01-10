@@ -1,0 +1,3 @@
+train:
+  data: Pima_Indians_Diabetes.csv
+  model: model.pkl

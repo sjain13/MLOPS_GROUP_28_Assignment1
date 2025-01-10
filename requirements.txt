@@ -1,0 +1,7 @@
+flask
+pyyaml
+pandas
+pytest
+scikit-learn
+mlflow
+dvc
