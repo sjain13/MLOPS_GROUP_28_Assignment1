@@ -3,6 +3,7 @@ import yaml
 import pandas as pd
 from flask import Flask, request, jsonify
 from train_model import train_model_with_gs
+import mlflow
 
 app = Flask(__name__)
 
@@ -13,7 +14,7 @@ if not os.path.exists(params_path):
 # Load parameters from params.yaml
 params = yaml.safe_load(open(params_path))["train"]
 
-
+loaded_model_from_mlflow = None
 
 # Extract necessary parameters from params.yaml
 base_dir = os.path.dirname(os.path.abspath(__file__))  # Current directory (src)
@@ -62,6 +63,56 @@ def on_demand_retrain():
     except Exception as e:
         return jsonify({"error": f"Model training failed: {str(e)}"}), 500
 
+@app.route('/mlops/predict_diabetes_best_model_mlflow', methods=['POST'])
+def predict_diabetes_best_model_mlflow():
+    global loaded_model_from_mlflow
+
+    try:
+        # Parse input JSON
+        data = request.get_json()
+        features = data.get("features", None)
+
+        if not features:
+            return jsonify({"error": "No features provided"}), 400
+
+        # Convert input features to DataFrame
+        input_df = pd.DataFrame([features])
+
+        # Set MLflow tracking URI and experiment
+        mlflow.set_tracking_uri('http://localhost:5000')
+        mlflow.set_experiment("Prima_Indians_Diabetes_Analysis")
+
+        # Get the latest run for the experiment
+        experiment = mlflow.get_experiment_by_name("Prima_Indians_Diabetes_Analysis")
+        runs = mlflow.search_runs(experiment_ids=[experiment.experiment_id])
+        latest_run = runs.sort_values(by="start_time", ascending=False).iloc[0]
+        latest_run_id = latest_run['run_id']  # Extract the run ID of the latest run
+        model_uri = f"runs:/{latest_run_id}/model"
+
+        # Load the latest model if not already loaded
+        if loaded_model_from_mlflow is None:
+            loaded_model_from_mlflow = mlflow.sklearn.load_model(model_uri)
+
+        # Make predictions
+        predictions = loaded_model_from_mlflow.predict(input_df)
+
+        # Prepare response
+        response = {
+            "predicted_outcome": translate_to_english(predictions[0])  # Convert numpy.int64 to int for JSON
+        }
+        return jsonify(response), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+def translate_to_english(predicted_class):
+    if predicted_class == 0:
+        predicted_class_string = "Diabetes Negative"
+    elif predicted_class == 1:
+        predicted_class_string = "Diabetes Positive"
+    else:
+        predicted_class_string = "Diabetes Negative"
+    return predicted_class_string
 
 if __name__ == '__main__':
     app.run(debug=True, port=5001)

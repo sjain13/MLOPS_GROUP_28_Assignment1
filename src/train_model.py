@@ -22,8 +22,11 @@ def train_model_with_gs(data_path,model_path,param_grid):
     X=data.drop(columns=["Outcome"])
     y=data['Outcome']
 
-    mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
+    mlflow.set_tracking_uri('http://127.0.0.1:5000')
+    if not mlflow.get_experiment_by_name('Prima_Indians_Diabetes_Analysis'):
+            mlflow.create_experiment('Prima_Indians_Diabetes_Analysis')
 
+    mlflow.set_experiment('Prima_Indians_Diabetes_Analysis')
 
     ## start the MLFLOW run
     with mlflow.start_run():
@@ -31,15 +34,6 @@ def train_model_with_gs(data_path,model_path,param_grid):
         X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.20)
         signature=infer_signature(X_train,y_train)
 
-        ## Define hyperparameter grid
-
-        # param_grid = {
-        #     'n_estimators': [100, 200],
-        #     'max_depth': [5, 10, None],
-        #     'min_samples_split': [2, 5],
-        #     'min_samples_leaf': [1, 2]
-        # }
-        
         # Perform hyperparameter tuning
         grid_search=hyperparameter_tuning(X_train,y_train,param_grid)
 
@@ -62,6 +56,7 @@ def train_model_with_gs(data_path,model_path,param_grid):
             "recall": report["1"]["recall"],
             "f1_score": report["1"]["f1-score"]
         }
+
 
         # Log metrics to MLFlow
         mlflow.log_metric('accuracy', model_scores["accuracy"])
