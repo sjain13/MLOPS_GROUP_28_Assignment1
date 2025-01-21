@@ -114,5 +114,17 @@ def translate_to_english(predicted_class):
         predicted_class_string = "Diabetes Negative"
     return predicted_class_string
 
+
+@app.route('/mlops//test', methods=['GET'])
+def test_api():
+    """
+    A simple GET API to test the application.
+    """
+    response = {
+        "message": "Application is running successfully!",
+        "status": "success"
+    }
+    return jsonify(response), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
