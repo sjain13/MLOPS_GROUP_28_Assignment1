@@ -57,7 +57,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/prashi2301/predict_diabetes_app:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/predict_diabetes_app:latest
 
     - name: Image digest
       run: echo ${{ steps.build-and-publish.outputs.digest }}
