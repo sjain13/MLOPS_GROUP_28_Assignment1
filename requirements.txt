@@ -4,4 +4,5 @@ pandas
 pytest
 scikit-learn
 mlflow
+pytest-mock
 dvc

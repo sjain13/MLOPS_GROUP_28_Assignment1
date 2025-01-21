@@ -2,7 +2,7 @@ import os
 import yaml
 import pandas as pd
 from flask import Flask, request, jsonify
-from train_model import train_model_with_gs
+from src.train_model import train_model_with_gs
 import mlflow
 
 app = Flask(__name__)
@@ -115,7 +115,7 @@ def translate_to_english(predicted_class):
     return predicted_class_string
 
 
-@app.route('/mlops//test', methods=['GET'])
+@app.route('/mlops/test', methods=['GET'])
 def test_api():
     """
     A simple GET API to test the application.
