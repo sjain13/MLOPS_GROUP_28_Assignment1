@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: predict-diabetes-service
+spec:
+  selector:
+    app: {{ .Values.appName }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: {{ .Values.containerPort }}
+  type: LoadBalancer
