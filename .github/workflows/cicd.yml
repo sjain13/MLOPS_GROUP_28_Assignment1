@@ -82,7 +82,7 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/predict_diabetes_app:1.0.0
+        tags: ${{ secrets.DOCKER_USERNAME }}/predict_diabetes_app:1.1.1
 
     - name: Output Docker Image Digest
       run: echo ${{ steps.build-and-publish.outputs.digest }}

@@ -2,7 +2,7 @@ import os
 import yaml
 import pandas as pd
 from flask import Flask, request, jsonify
-from src.train_model import train_model_with_gs
+from train_model import train_model_with_gs
 import mlflow
 
 app = Flask(__name__)
@@ -61,7 +61,7 @@ def on_demand_retrain():
         return jsonify(response), 200
 
     except Exception as e:
-        return jsonify({"error": f"Model training failed: {str(e)}"}), 500
+        return jsonify({"error": f"Model training failed for Prediction: {str(e)}"}), 500
 
 @app.route('/mlops/predict_diabetes_best_model_mlflow', methods=['POST'])
 def predict_diabetes_best_model_mlflow():
